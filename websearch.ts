@@ -146,7 +146,7 @@ export function createWebSearchTool(composition?: WebSearchToolComposition) {
 			text = appendExpandHint(text, options.expanded, context);
 
 			if (options.expanded) {
-				text = appendExpandedPreview(text, getTextContent(result.content), theme, { maxLines: 16, maxColumns: 220 });
+				text = appendExpandedPreview(text, getTextContent(result.content), theme, { maxLines: Infinity, maxColumns: Infinity });
 				if (details?.fullOutputPath) {
 					text += `\n${theme.fg("dim", `Full output: ${details.fullOutputPath}`)}`;
 				}

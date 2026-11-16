@@ -151,7 +151,7 @@ export function createWebFetchTool(composition?: WebFetchToolComposition) {
 				if (details?.image) {
 					text += `\n${theme.fg("dim", `Image URL: ${details.finalUrl}`)}`;
 				} else {
-					text = appendExpandedPreview(text, getTextContent(result.content), theme, { maxLines: 12, maxColumns: 220 });
+					text = appendExpandedPreview(text, getTextContent(result.content), theme, { maxLines: Infinity, maxColumns: Infinity });
 				}
 				if (details?.fullOutputPath) {
 					text += `\n${theme.fg("dim", `Full output: ${details.fullOutputPath}`)}`;
