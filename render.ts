@@ -1,4 +1,40 @@
 import { keyHint } from "@earendil-works/pi-coding-agent";
+import { getCapabilities, hyperlink } from "@earendil-works/pi-tui";
+import type { NormalizedSearchResult } from "./types.ts";
+
+interface RenderTheme {
+	fg: (name: string, value: string) => string;
+	bold: (value: string) => string;
+	italic?: (value: string) => string;
+	underline?: (value: string) => string;
+}
+
+/** Wrap styled text in an OSC 8 link when the terminal forwards hyperlinks. */
+export function linkUrl(styledText: string, url: string): string {
+	return getCapabilities().hyperlinks ? hyperlink(styledText, url) : styledText;
+}
+
+/** Render structured search results for the expanded TUI view. Not sent to the LLM. */
+export function appendSearchResults(base: string, results: readonly NormalizedSearchResult[], theme: RenderTheme): string {
+	const indent = "   ";
+	for (const [index, result] of results.entries()) {
+		base += "\n";
+		const title = linkUrl(theme.bold(theme.fg("mdHeading", result.title)), result.url);
+		base += `\n${theme.fg("dim", `${index + 1}.`)} ${title}`;
+		const url = theme.fg("mdLink", result.url);
+		base += `\n${indent}${linkUrl(theme.underline ? theme.underline(url) : url, result.url)}`;
+		if (result.publishedAt) {
+			const date = theme.fg("dim", result.publishedAt);
+			base += `\n${indent}${theme.italic ? theme.italic(date) : date}`;
+		}
+		if (result.snippet) {
+			for (const line of result.snippet.split("\n")) {
+				base += `\n${indent}${theme.fg("toolOutput", line)}`;
+			}
+		}
+	}
+	return base;
+}
 
 export function getTextContent(content: Array<{ type: string; text?: string }> | undefined): string {
 	if (!content) return "";

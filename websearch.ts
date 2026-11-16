@@ -6,7 +6,7 @@ import { FetchHttpTextClient, ExaSearchProvider } from "./providers/exa.ts";
 import { KeenableSearchProvider } from "./providers/keenable.ts";
 import { ParallelSearchProvider } from "./providers/parallel.ts";
 import type { SearchProvider } from "./providers/types.ts";
-import { appendExpandHint, appendExpandedPreview, getTextContent, type ExpandHintContext } from "./render.ts";
+import { appendExpandHint, appendExpandedPreview, appendSearchResults, getTextContent, type ExpandHintContext } from "./render.ts";
 import { SearchWeb, type SearchWebError } from "./search-web.ts";
 import { getWebSearchSettings, SEARCH_DEPTHS, type ToolInputParseError } from "./settings.ts";
 import {
@@ -146,7 +146,9 @@ export function createWebSearchTool(composition?: WebSearchToolComposition) {
 			text = appendExpandHint(text, options.expanded, context);
 
 			if (options.expanded) {
-				text = appendExpandedPreview(text, getTextContent(result.content), theme, { maxLines: Infinity, maxColumns: Infinity });
+				text = details?.results?.length
+					? appendSearchResults(text, details.results, theme)
+					: appendExpandedPreview(text, getTextContent(result.content), theme, { maxLines: Infinity, maxColumns: Infinity });
 				if (details?.fullOutputPath) {
 					text += `\n${theme.fg("dim", `Full output: ${details.fullOutputPath}`)}`;
 				}
