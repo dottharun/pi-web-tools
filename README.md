@@ -3,7 +3,7 @@
 A [Pi](https://pi.dev) package that adds tools for fetching and searching the public web.
 
 - `webfetch` fetches one public URL as Markdown, text, raw HTML, or an inline raster image.
-- `websearch` searches the public web through an Exa or Parallel MCP-compatible endpoint.
+- `websearch` searches the public web through an Exa or Parallel MCP-compatible endpoint, or Keenable's public search API.
 
 ## Install
 
@@ -19,6 +19,12 @@ Or select Parallel:
 ```bash
 export PI_WEB_TOOLS_SEARCH_PROVIDER="parallel"
 export PI_WEB_TOOLS_PARALLEL_ENDPOINT="https://your-parallel-endpoint.example/mcp"
+```
+
+Or select Keenable, which needs no key or endpoint:
+
+```bash
+export PI_WEB_TOOLS_SEARCH_PROVIDER="keenable"
 ```
 
 Try it for one Pi invocation without installing:
@@ -60,7 +66,7 @@ Parameters:
 Defaults and behavior:
 
 - returns up to eight results
-- defaults to Exa and optionally supports Parallel
+- defaults to Exa and optionally supports Parallel or Keenable
 - limits provider responses to 1 MB
 - truncates large tool output and saves the complete output to a temporary file
 
@@ -78,6 +84,14 @@ To use Parallel instead:
 export PI_WEB_TOOLS_SEARCH_PROVIDER="parallel"
 export PI_WEB_TOOLS_PARALLEL_ENDPOINT="https://your-parallel-endpoint.example/mcp"
 ```
+
+To use Keenable instead:
+
+```bash
+export PI_WEB_TOOLS_SEARCH_PROVIDER="keenable"
+```
+
+Keenable calls the unauthenticated `https://api.keenable.ai/v1/search/public` endpoint by default, which is rate limited per IP. Set `PI_WEB_TOOLS_KEENABLE_ENDPOINT` to override it. `depth: "fast"` maps to Keenable's `realtime` mode; `auto` and `deep` use `pro`. Snippets are capped at 300 characters per result.
 
 `webfetch` does not require these variables. Per-call arguments can override `webfetch.format`, `webfetch.timeout`, `websearch.maxResults`, and `websearch.depth`.
 

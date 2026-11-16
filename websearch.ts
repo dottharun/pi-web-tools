@@ -3,6 +3,7 @@ import { Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 import { createOperationSignal, isOperationTimeoutError } from "./network.ts";
 import { FetchHttpTextClient, ExaSearchProvider } from "./providers/exa.ts";
+import { KeenableSearchProvider } from "./providers/keenable.ts";
 import { ParallelSearchProvider } from "./providers/parallel.ts";
 import type { SearchProvider } from "./providers/types.ts";
 import { appendExpandHint, appendExpandedPreview, getTextContent, type ExpandHintContext } from "./render.ts";
@@ -176,6 +177,8 @@ function createSearchProvider(settings: WebToolsSettings["search"]): SearchProvi
 			return new ExaSearchProvider(settings.endpoint, new FetchHttpTextClient());
 		case "parallel":
 			return new ParallelSearchProvider(settings.endpoint, new FetchHttpTextClient());
+		case "keenable":
+			return new KeenableSearchProvider(settings.endpoint, new FetchHttpTextClient());
 	}
 }
 

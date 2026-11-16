@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
 	EXA_ENDPOINT_ENVIRONMENT_VARIABLE,
+	KEENABLE_ENDPOINT_ENVIRONMENT_VARIABLE,
 	PARALLEL_ENDPOINT_ENVIRONMENT_VARIABLE,
 	SEARCH_PROVIDER_ENVIRONMENT_VARIABLE,
 	getWebFetchSettings,
@@ -51,6 +52,22 @@ test("web search settings parse Parallel provider configuration", () => {
 
 	assert.equal(settings.provider, "parallel");
 	assert.equal(settings.endpoint, "https://example.test/parallel");
+});
+
+test("web search settings default Keenable to its public endpoint", () => {
+	const settings = getWebSearchSettings({ [SEARCH_PROVIDER_ENVIRONMENT_VARIABLE]: "keenable" });
+
+	assert.equal(settings.provider, "keenable");
+	assert.equal(settings.endpoint, "https://api.keenable.ai/v1/search/public");
+});
+
+test("web search settings allow overriding the Keenable endpoint", () => {
+	const settings = getWebSearchSettings({
+		[SEARCH_PROVIDER_ENVIRONMENT_VARIABLE]: "keenable",
+		[KEENABLE_ENDPOINT_ENVIRONMENT_VARIABLE]: "https://example.test/keenable",
+	});
+
+	assert.equal(settings.endpoint, "https://example.test/keenable");
 });
 
 test("web search settings require a configured Exa endpoint", () => {
