@@ -65,14 +65,12 @@ test("KeenableSearchProvider posts the public search body and parses results", a
 			url: "https://docs.keenable.ai/cli",
 			snippet: "Search and fetch work without an account.",
 			publishedAt: "2026-11-12T19:23:16Z",
-			source: "Keenable",
 		},
 		{
 			title: "https://docs.keenable.ai/faq.md",
 			url: "https://docs.keenable.ai/faq.md",
 			snippet: undefined,
 			publishedAt: undefined,
-			source: "Keenable",
 		},
 	]);
 	assert.equal(http.requests[0]?.url, endpoint);

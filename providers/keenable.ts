@@ -90,7 +90,6 @@ function parseKeenableResponse(body: string): Result<readonly NormalizedSearchRe
 			url: url.value,
 			snippet: item.snippet?.trim() || undefined,
 			publishedAt: item.published_at?.trim() || undefined,
-			source: "Keenable",
 		});
 	}
 	return ok(results);

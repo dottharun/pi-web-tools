@@ -103,7 +103,6 @@ function parseParallelResponse(body: string): Result<readonly NormalizedSearchRe
 			url: url.value,
 			snippet: item.excerpts.join("\n\n").trim() || undefined,
 			publishedAt: item.publish_date?.trim() || undefined,
-			source: "Parallel",
 		});
 	}
 	return ok(results);
