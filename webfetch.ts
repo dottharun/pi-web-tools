@@ -4,7 +4,7 @@ import { Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 import { FetchPage, type FetchPageError } from "./fetch-page.ts";
 import { createOperationSignal, FetchPublicWebClient, isOperationTimeoutError } from "./network.ts";
-import { appendExpandHint, appendExpandedPreview, getTextContent, type ExpandHintContext } from "./render.ts";
+import { appendExpandHint, appendExpandedPreview, getTextContent, linkUrl, type ExpandHintContext } from "./render.ts";
 import { getWebFetchSettings, WEB_FETCH_FORMATS, type ToolInputParseError } from "./settings.ts";
 import {
 	TempFileToolOutputStore,
@@ -111,7 +111,10 @@ export function createWebFetchTool(composition?: WebFetchToolComposition) {
 
 		renderCall(args: { url: string; format?: WebFetchFormat }, theme: RenderTheme) {
 			let text = theme.fg("toolTitle", theme.bold("webfetch "));
-			text += theme.fg("accent", redactUrlCredentialsForDisplay(args.url));
+			const displayUrl = redactUrlCredentialsForDisplay(args.url);
+			const linkTarget = toLinkableUrl(displayUrl);
+			const styledUrl = theme.fg("accent", displayUrl);
+			text += linkTarget ? linkUrl(styledUrl, linkTarget) : styledUrl;
 			if (args.format && args.format !== "markdown") {
 				text += theme.fg("muted", ` (${args.format})`);
 			}
@@ -161,6 +164,17 @@ export function createWebFetchTool(composition?: WebFetchToolComposition) {
 			return new Text(text, 0, 0);
 		},
 	};
+}
+
+/** Only http(s) URLs without credentials become OSC 8 links; anything else stays plain text. */
+function toLinkableUrl(displayUrl: string): string | undefined {
+	try {
+		const url = new URL(displayUrl);
+		if ((url.protocol !== "http:" && url.protocol !== "https:") || url.username || url.password) return undefined;
+		return url.toString();
+	} catch {
+		return undefined;
+	}
 }
 
 export function toWebFetchToolError(error: WebFetchBoundaryError): Error {

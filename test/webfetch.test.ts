@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { initTheme } from "@earendil-works/pi-coding-agent";
+import { getCapabilities, setCapabilities } from "@earendil-works/pi-tui";
 import {
 	createWebFetchTool,
 	createWebFetchHeaders,
@@ -40,6 +41,28 @@ test("webfetch renderResult prefers host key hints for collapsed results", () =>
 		},
 	});
 	assert.match(expanded.render(200).join("\n"), /Fetched content/);
+});
+
+test("webfetch renderCall links http(s) URLs with OSC 8 when supported", (t) => {
+	const tool = createWebFetchTool();
+	const original = getCapabilities();
+	t.after(() => setCapabilities(original));
+
+	setCapabilities({ ...original, hyperlinks: true });
+	const linked = tool.renderCall({ url: "https://example.com/page" }, renderTheme).render(200).join("\n");
+	assert.match(linked, /\x1b\]8;;https:\/\/example\.com\/page/);
+
+	const credentialed = tool.renderCall({ url: "https://user:pass@example.com/secret" }, renderTheme).render(200).join("\n");
+	assert.doesNotMatch(credentialed, /\x1b\]8;;/);
+	assert.doesNotMatch(credentialed, /pass/);
+
+	const nonHttp = tool.renderCall({ url: "file:///etc/passwd" }, renderTheme).render(200).join("\n");
+	assert.doesNotMatch(nonHttp, /\x1b\]8;;/);
+
+	setCapabilities({ ...original, hyperlinks: false });
+	const plain = tool.renderCall({ url: "https://example.com/page" }, renderTheme).render(200).join("\n");
+	assert.doesNotMatch(plain, /\x1b\]8;;/);
+	assert.match(plain, /https:\/\/example\.com\/page/);
 });
 
 test("webfetch execute rejects URL credentials with a safe message", async () => {
